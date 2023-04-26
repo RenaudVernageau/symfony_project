@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User index{% endblock %}
+
+{% block body %}
+    <h3>Liste des utilisateurs</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Lastname</th>
+                <th>Firstname</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.lastname }}</td>
+                <td>{{ user.firstname }}</td>
+                <td>{{ user.statut ? 'Administrateur' : 'Client' }}</td>
+                <td>
+                    <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">Pas d\'utilisateur enregistré</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CartContentsController!
+{% endblock %}
+
+{% block body %}
+
+	<h1>Vos achats commandés</h1>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Produit</th>
+				<th>Quantité</th>
+				<th>Prix</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for cartContent in cartContents %}
+				<tr>
+					<td>{{ cartContent.id }}</td>
+					<td>{{ cartContent.product.name }}</td>
+					<td>{{ cartContent.quantity }}</td>
+					<td>{{ cartContent.product.price }}</td>
+					<td>
+						<a href="{{ path('cart_contents_show', {'id': cartContent.id}) }}">show</a>
+						<a href="{{ path('cart_contents_edit', {'id': cartContent.id}) }}">edit</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="8">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+{% endblock %}
+

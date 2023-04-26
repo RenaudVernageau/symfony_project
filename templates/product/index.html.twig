@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product index
+{% endblock %}
+
+{% block body %}
+	<h1>Marché de Bèsbar</h1>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Nom</th>
+				<th>Description</th>
+				<th>Prix</th>
+				<th>Image</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for product in products %}
+				<tr>
+					<td>{{ product.name }}</td>
+					<td>{{ product.description }}</td>
+					<td>{{ product.price }} €</td>
+					<td>
+					{% if product.image is not null %}
+						<img style="max-width: 100px" class="rounded" src="{{ asset('/uploads/'~ product.image )}}" alt="image du produit">
+					{% endif %}
+					</td>
+					<td>
+						<div><a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_cart_add', {'id': product.id}) }}">🛒</a></div>
+						<div>
+							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_show', {'id': product.id}) }}">Info</a>
+							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_edit', {'id': product.id}) }}">Modifier</a>
+						</div>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">Il n'y a pas de produit enregistré</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+  <div class="d-grid gap-2 col-6 mx-auto">
+    <a class="btn btn-primary" href="{{ path('app_product_new') }}">Ajouter un produit</a>
+  </div>
+{% endblock %}
+
