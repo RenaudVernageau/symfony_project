@@ -1,36 +1,59 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CartController!{% endblock %}
+{% block title %}Hello CartController!
+{% endblock %}
 
 {% block body %}
 
-    <h1>CartController</h1>
+	<h1>Mon panier</h1>
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in cart %}
-            <tr>
-                <td>{{ item.id }}</td>
-                <td>{{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.product.price }}</td>
-                <td>
-                    <a href="{{ path('cart_remove', {'id': item.id}) }}">Remove</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Produit</th>
+				<th>Prix</th>
+				<th>Quantités</th>
+				<th>Total</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in items %}
+				<tr>
+					<td>{{ item.product.name }}</td>
+					<td>{{ item.product.price }}
+						€</td>
+					<td>{{ item.quantity }}</td>
+					<td>{{ item.product.price * item.quantity }}
+						€</td>
+					<td>
+						<a href="{{ path('app_cart_add', {'id': item.product.id}) }}" class="btn btn-success">
+							<i class="bi bi-cart-plus"></i>
+						</a>
+						<a href="{{ path('app_cart_remove', {'id': item.product.id}) }}" class="btn btn-warning">
+							<i class="bi bi-cart-dash"></i>
+						</a>
+						<a href="{{path("app_cart_delete", {id: item.product.id})}}" class="btn btn-danger">
+							<i class="bi bi-cart-x"></i>
+						</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">Il n'y a pas de produit enregistré dans le panier</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="3">Total</td>
+				<td class="text-end">{{ total }}
+					€</td>
+			</tr>
+		</tfoot>
+	</table>
 
-    <a href="{{ path('cart_checkout') }}">Checkout</a>
+	{# <a href="{{ path('cart_checkout') }}">Checkout</a> #}
 
 {% endblock %}
+

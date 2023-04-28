@@ -2,95 +2,108 @@
 
 namespace App\Controller;
 
-use App\Entity\Cart;
-use App\Entity\CartContents;
 use App\Entity\Product;
+use App\Repository\CartContentsRepository;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class CartController extends AbstractController
 {
-    #[Route('/cart', name: 'app_cart')]
-    public function index(): Response
-    {
-        //Afficher les achats de l'utilisateur
-        $user = $this->getUser();
-        $cart = $user->getCart();
+	#[Route('/cart', name: 'app_cart')]
+	public function index(SessionInterface $session, ProductRepository $productRepository): Response
+	{
+		//On récupère le panier actuel
+		$cart = $session->get("cart", []);
 
-        if (!$cart) {
-            // Si le panier n'existe pas encore, vous pouvez créer un nouveau panier ici
-            $cart = new Cart();
-            $cart->setUser($user);
-            $cart->setStatus(0);
-            $cart->setDate(new \DateTime());
-        }
+		//On fabrique les données
+		$cartWithData = [];
+		$total = 0;
 
-        $cartContents = $cart->getCartContents();
+		//On boucle sur le panier
+		foreach ($cart as $id => $quantity) {
+			//On récupère le produit
+			$product = $productRepository->find($id);
 
-        return $this->render('cart/index.html.twig', [
-            'cartContents' => $cartContents,
-        ]);
-    }
+			// On vérifie si le produit a été trouvé
+			if ($product !== null) {
+				// On fabrique les données
+				$cartWithData[] = [
+					"product" => $product,
+					"quantity" => $quantity
+				];
 
-    #[Route('/cart/add/{id}', name: 'app_cart_add')]
-    public function addProduct(Product $product, EntityManagerInterface $em): Response
-    {
-        // Ajouter un produit dans le panier de l'utilisateur
-        $user = $this->getUser();
+				//On calcule le total
+				$total += $product->getPrice() * $quantity;
+			}
+		}
 
-        // $cart = $user->getCarts();
-        $cart = $em->getRepository(Cart::class)->findOneBy(['user' => $user, 'status' => 0]);
+		//On affiche le rendu
+		return $this->render('cart/index.html.twig', [
+			"items" => $cartWithData,
+			"total" => $total
+		]);
+	}
 
-        if (!$cart) {
-            $cart = new Cart();
-            $cart->setUser($user);
-            $cart->setStatus(0);
-            $cart->setDate(new \DateTime());
-        }
+	#[Route('/cart/add/{id}', name: 'app_cart_add')]
+	public function addProduct(Product $product, SessionInterface $session): Response
+	{
+		//On récupère le panier actuel
+		$cart = $session->get("cart", []);
+		$id = $product->getId();
 
-        $cartItem = $em->getRepository(CartItem::class)->findOneBy(['cart' => $cart, 'product' => $product]);
+		//Si le panier n'est pas vide
+		if (!empty($cart)) {
+			//On vérifie si le produit est déjà dans le panier
+			if (isset($cart[$id])) {
+				//Si oui, on augmente la quantité
+				$cart[$id]++;
+			} else {
+				//Si non, on ajoute le produit
+				$cart[$id] = 1;
+			}
+		} else {
+			//Si le panier est vide, on ajoute le produit
+			$cart[$id] = 1;
+		}
 
-        if (!$cartItem) {
-            $cartItem = new CartItem();
-            $cartItem->setCart($cart);
-            $cartItem->setProduct($product);
-            $cartItem->setQuantity(1);
-        } else {
-            $cartItem->setQuantity($cartItem->getQuantity() + 1);
-        }
+		//On enregistre le panier
+		$session->set("cart", $cart);
 
-        $em->persist($cart);
-        $em->persist($cartItem);
-        $em->flush();
+		//On redirige vers le panier
+		return $this->redirectToRoute("app_cart");
+	}
 
-        return $this->redirectToRoute('app_cart');
+	#[Route('/cart/remove/{id}', name: 'app_cart_remove')]
+	public function remove(Product $product, SessionInterface $session)
+	{
+		//On récupère le panier actuel
+		$cart = $session->get("cart", []);
+		$id = $product->getId();
 
-        $product = $this->getDoctrine()->getRepository(Product::class)->find($productId);
+		//Si le panier n'est pas vide
+		if (!empty($cart)) {
+			//On vérifie si le produit est déjà dans le panier
+			if (isset($cart[$id])) {
+				//Si oui, on augmente la quantité
+				$cart[$id]--;
+			} else {
+				//Si non, on ajoute le produit
+				$cart[$id] = 1;
+			}
+		} else {
+			//Si le panier est vide, on ajoute le produit
+			$cart[$id] = 1;
+		}
 
-        if (!$product) {
-            throw $this->createNotFoundException('Le produit n\'existe pas');
-        }
+		//On enregistre le panier
+		$session->set("cart", $cart);
 
-        $cartItem = $this->getDoctrine()->getRepository(CartItem::class)->findOneBy([
-            'cart' => $cart,
-            'product' => $product
-        ]);
-
-        if (!$cartItem) {
-            $cartItem = new CartItem();
-            $cartItem->setCart($cart)
-                ->setProduct($product)
-                ->setQuantity(1);
-        } else {
-            $cartItem->setQuantity($cartItem->getQuantity() + 1);
-        }
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($cartItem);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('app_cart');
-    }
+		//On redirige vers le panier
+		return $this->redirectToRoute("app_cart");
+	}
 }

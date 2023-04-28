@@ -28,10 +28,10 @@
 					{% endif %}
 					</td>
 					<td>
-						<div><a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_cart_add', {'id': product.id}) }}">🛒</a></div>
+						<div><a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_cart_add', {'id': product.id}) }}"><i class="bi bi-cart-plus"></i></a></div>
 						<div>
-							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_show', {'id': product.id}) }}">Info</a>
-							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_edit', {'id': product.id}) }}">Modifier</a>
+							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_show', {'id': product.id}) }}"><i class="bi bi-info"></i></a>
+							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_edit', {'id': product.id}) }}"><i class="bi bi-pencil"></i></a>
 						</div>
 					</td>
 				</tr>
