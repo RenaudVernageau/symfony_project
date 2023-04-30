@@ -1,11 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modification de l'utilisateur{% endblock %}
+{% block title %}
+	Chez Renard ! Modification de l'utilisateur
+{% endblock %}
 
 {% block body %}
-    <h3>Modification de l'utilisateur</h3>
+	<div class="container my-5">
+		<h3 class="text-center mb-4">Modification de l'utilisateur</h3>
 
-    {{ include('user/_form.html.twig', {'button_label': 'Update'}) }}
+		<div class="row justify-content-center">
+			<div class="col-md-6">
+				{{ include('user/_form.html.twig', {'button_label': 'Modifier'}) }}
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+				<div class="text-center mt-4">
+					<a class="btn btn-light m-1" href="{{ path('app_product_index') }}">
+						<i class="bi bi-arrow-left"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
+

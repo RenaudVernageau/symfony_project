@@ -37,6 +37,13 @@ class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, AuthAuthenticator $authenticator, EntityManagerInterface $entityManager, User $user): Response
     {
+
+        $loggedInUser = $this->getUser();
+
+        if ($loggedInUser !== $user) { // compare l'utilisateur connecté avec l'utilisateur demandé
+            throw $this->createAccessDeniedException("Vous n'êtes pas autorisé à accéder à ce profil."); // lance une exception si l'utilisateur connecté n'est pas autorisé
+        }
+
         $user->setStatut(false);
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);

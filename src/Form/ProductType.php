@@ -35,7 +35,7 @@ class ProductType extends AbstractType
           ])
         ],
       ])
-      ->add('cartContents');
+      ->remove('cartContents');
   }
 
   public function configureOptions(OptionsResolver $resolver): void

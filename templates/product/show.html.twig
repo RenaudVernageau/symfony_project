@@ -1,48 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Product
+{% block title %}Chez Renard ! Détails du produit
 {% endblock %}
 
 {% block body %}
-	<h1>Product</h1>
+	<div class="container p-2">
+		<div class="row">
+			<div class="col-md-6 mx-auto d-flex align-items-center justify-content-center my-auto">
+				<div>
+					<h1>{{ product.name }}</h1>
 
-	<table class="table">
-		<tbody>
-			<tr>
-				<th>Id</th>
-				<td>{{ product.id }}</td>
-			</tr>
-			<tr>
-				<th>Name</th>
-				<td>{{ product.name }}</td>
-			</tr>
-			<tr>
-				<th>Description</th>
-				<td>{{ product.description }}</td>
-			</tr>
-			<tr>
-				<th>Price</th>
-				<td>{{ product.price }}</td>
-			</tr>
-			<tr>
-				<th>Quantity</th>
-				<td>{{ product.quantity }}</td>
-			</tr>
-			<tr>
-				<th>Image</th>
-				<td>
 					{% if product.image is not null %}
 						<img style="max-width: 100px" class="rounded" src="{{ asset('/uploads/'~ product.image )}}" alt="image du produit">
 					{% endif %}
-				</td>
-			</tr>
-		</tbody>
-	</table>
 
-	<a href="{{ path('app_product_index') }}">back to list</a>
+					<table class="table table-striped">
+						<tbody>
+							<p class="lead text-muted text-justify text-wrap">{{ product.description }}
+							</p>
+							<span class="badge bg-primary m-1">{{ product.price }}
+								€</span>
+							<span class="badge bg-secondary m-1">{{ product.quantity }}
+								disponibles</span><br>
 
-	<a href="{{ path('app_product_edit', {'id': product.id}) }}">edit</a>
 
-	{{ include('product/_delete_form.html.twig') }}
-{% endblock %}
+							<a class="btn btn-light m-1" href="{{ path('app_product_index') }}">
+								<i class="bi bi-arrow-left"></i>
+							</a>
+							{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+
+								<a class="btn btn-success m-2" href="{{ path('app_cart_add', {'id': product.id}) }}">
+									<i class="bi bi-cart-plus"></i>
+								</a>
+
+							{% endif %}
+							<a class="btn btn-warning m-1" href="{{ path('app_product_edit', {'id': product.id}) }}">
+								<i class="bi bi-pencil-fill"></i>
+							</a>
+							{{ include('product/_delete_form.html.twig') }}
+						</tbody>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endblock %}
 

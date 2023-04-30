@@ -1,49 +1,64 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Product index
-{% endblock %}
+{% block title %}Chez Renard ! Les produits !{% endblock %}
 
 {% block body %}
-	<h1>Marché de Bèsbar</h1>
+<div class="container">
+    <h1 class="text-center mb-4">En stock ! 💥</h1>
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Nom</th>
-				<th>Description</th>
-				<th>Prix</th>
-				<th>Image</th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for product in products %}
-				<tr>
-					<td>{{ product.name }}</td>
-					<td>{{ product.description }}</td>
-					<td>{{ product.price }} €</td>
-					<td>
-					{% if product.image is not null %}
-						<img style="max-width: 100px" class="rounded" src="{{ asset('/uploads/'~ product.image )}}" alt="image du produit">
-					{% endif %}
-					</td>
-					<td>
-						<div><a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_cart_add', {'id': product.id}) }}"><i class="bi bi-cart-plus"></i></a></div>
-						<div>
-							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_show', {'id': product.id}) }}"><i class="bi bi-info"></i></a>
-							<a class="link-offset-2 link-underline link-underline-opacity-0" href="{{ path('app_product_edit', {'id': product.id}) }}"><i class="bi bi-pencil"></i></a>
-						</div>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="7">Il n'y a pas de produit enregistré</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-  <div class="d-grid gap-2 col-6 mx-auto">
-    <a class="btn btn-primary" href="{{ path('app_product_new') }}">Ajouter un produit</a>
-  </div>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Prix</th>
+                        <th>Image</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.description }}</td>
+                        <td>{{ product.price }} €</td>
+                        <td>
+                            {% if product.image is not null %}
+                            <img src="{{ asset('/uploads/'~ product.image )}}" class="img-thumbnail" style="max-height: 100px" alt="image du produit">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-success m-2" href="{{ path('app_cart_add', {'id': product.id}) }}">
+                                    <i class="bi bi-cart-plus"></i>
+                                </a>
+                            </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-light m-2" href="{{ path('app_product_show', {'id': product.id}) }}">
+                                    <i class="bi bi-info"></i>
+                                </a>
+                                <a class="btn btn-warning m-2" href="{{ path('app_product_edit', {'id': product.id}) }}">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Il n'y a pas de produit enregistré</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-grid gap-2 col-6 mx-auto mt-4">
+        <a class="btn btn-primary" href="{{ path('app_product_new') }}">Ajouter un produit</a>
+    </div>
+</div>
 {% endblock %}
-

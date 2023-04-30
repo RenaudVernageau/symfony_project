@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\CartContents;
 use App\Entity\Product;
 use App\Repository\CartContentsRepository;
 use App\Repository\ProductRepository;
@@ -86,18 +87,13 @@ class CartController extends AbstractController
 		$id = $product->getId();
 
 		//Si le panier n'est pas vide
-		if (!empty($cart)) {
+		if (!empty($cart[$id])) {
 			//On vérifie si le produit est déjà dans le panier
-			if (isset($cart[$id])) {
-				//Si oui, on augmente la quantité
+			if ($cart[$id] > 1) {
 				$cart[$id]--;
 			} else {
-				//Si non, on ajoute le produit
-				$cart[$id] = 1;
+				unset($cart[$id]);
 			}
-		} else {
-			//Si le panier est vide, on ajoute le produit
-			$cart[$id] = 1;
 		}
 
 		//On enregistre le panier
@@ -105,5 +101,39 @@ class CartController extends AbstractController
 
 		//On redirige vers le panier
 		return $this->redirectToRoute("app_cart");
+	}
+
+	// Cart checkout
+	#[Route('/cart/checkout', name: 'app_cart_checkout')]
+	public function checkout(SessionInterface $session, EntityManagerInterface $entityManager, CartContentsRepository $cartContentsRepository): Response
+	{
+		//On récupère le panier actuel
+		$cart = $session->get("cart", []);
+
+		//On boucle sur le panier
+		foreach ($cart as $id => $quantity) {
+			//On récupère le produit
+			$product = $entityManager->getRepository(Product::class)->find($id);
+
+			// On vérifie si le produit a été trouvé
+			if ($product !== null) {
+				// On fabrique les données
+				$cartContent = new CartContents();
+				$cartContent->setProduct($product);
+				$cartContent->setQuantity($quantity);
+
+				//On enregistre le contenu du panier
+				$entityManager->persist($cartContent);
+			}
+		}
+
+		//On enregistre le panier
+		$entityManager->flush();
+
+		//On vide le panier
+		$session->set("cart", []);
+
+		//On affiche le rendu
+		return $this->render('cart_contents/index.html.twig');
 	}
 }

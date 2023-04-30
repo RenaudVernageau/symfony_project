@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/')]
@@ -124,10 +125,21 @@ class ProductController extends AbstractController
 	}
 
 	#[Route('/product/{id}/delete', name: 'app_cart_delete', methods: ['GET'])]
-	public function deleteGet(Product $product, ProductRepository $productRepository): Response
+	public function deleteGet(Product $product, SessionInterface $session): Response
 	{
-		$productRepository->remove($product, true);
+		// On récupère le panier actuel
+		$cart = $session->get("cart", []);
+	
+		// On supprime le produit du panier
+		$cart = array_filter($cart, function ($id) use ($product) {
+			return $id !== $product->getId();
+		}, ARRAY_FILTER_USE_KEY);
+	
+		// On met à jour la session avec le nouveau panier
+		$session->set("cart", $cart);
+	
 		$this->addFlash('success', 'Produit bien supprimé');
-		return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+	
+		return $this->redirectToRoute('app_cart', [], Response::HTTP_SEE_OTHER);
 	}
 }
